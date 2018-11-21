@@ -1,8 +1,12 @@
 let express = require('express');
+let mongoose= require('mongoose')
+mongoose.connect('mongodb://localhost/UserCommentDB');
+
 let app = express();
 let User = require('./src/UserSchema');
 var bodyParser = require('body-parser')
-app.listen(5555);
+app.use(bodyParser.urlencoded({ extended: false }));   
+app.use(bodyParser.json()); 
 app.use(express.static('public'));
 app.use(express.static('node_modules'));
 app.use(function (req, res, next) {
@@ -13,9 +17,21 @@ app.use(function (req, res, next) {
     next()
   })
 
+  app.get('/comment', function(req, res){
+   User.find ({}, function(err, data){
+       if(err){
+           res.status(500).send(err)
+       }
+       else{
+           
+           res.send(data);
+       }
+   })
+})
 
 app.post("/comment",function(req,res){
-    User.create(req.body, function (err, data) {
+    console.log(req.body)
+    User.create(req.body , function (err, data) {
         if (err) {
             res.status(500).send(err)
         }
@@ -25,3 +41,5 @@ app.post("/comment",function(req,res){
         }
     });
 })
+
+app.listen(5555);  
